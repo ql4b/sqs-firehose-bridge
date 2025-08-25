@@ -1,0 +1,17 @@
+#!/bin/bash
+
+REPOSITORY_URL="$(tf output -json ecr | jq -r .repository_url)"
+TAG=${1:-"latest"}
+IMAGE="$REPOSITORY_URL:$TAG"
+NAME="$(cut -d':' -f1 <<< "$IMAGE" | cut -d'/' -f2)"
+HANDLER="handler.run"
+
+# Run with the Lambda Runtime Interface Emulator
+docker run --rm \
+    --entrypoint /usr/local/bin/aws-lambda-rie \
+    -p 9000:8080 \
+    --name "$NAME" \
+    --volume ./task/handler.sh:/var/task/handler.sh:rw \
+    "$IMAGE" \
+    "$@" \
+    /var/runtime/bootstrap "$HANDLER"

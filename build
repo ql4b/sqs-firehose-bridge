@@ -1,0 +1,36 @@
+#!/bin/bash
+# Build and push SQS-Firehose Lambda image to public registry
+
+if [ "$1" == "--help" ]; then
+    echo "Usage: $0 [--push | --load] [image_tag]"
+    echo "  --push: Build and push to public ecr (default)"
+    echo "  --load: Build and load locally"
+    exit 0
+fi
+
+MODE=${1:-"--push"}
+IMAGE_TAG=${2:-"latest"}
+ECR_IMAGE="public.ecr.aws/ql4b/sqs-firehose-bridge:${IMAGE_TAG}"
+# ECR_IMAGE="$(tf output -json ecr | jq -r .repository_url):${IMAGE_TAG}"
+
+if [ "$MODE" == "--push" ]; then
+    aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+    # Build and push to both registries
+    docker buildx build \
+        --platform linux/arm64,linux/amd64 \
+        --provenance false \
+        --tag "$ECR_IMAGE" \
+        --push \
+        .
+    
+    echo "Images pushed to:"
+    echo "  - $ECR_IMAGE"
+else
+    docker buildx build \
+        --platform linux/arm64,linux/amd64 \
+        --provenance false \
+        --tag "$ECR_IMAGE" \
+        "$MODE" \
+        .
+fi
+
