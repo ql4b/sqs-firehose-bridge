@@ -29,11 +29,11 @@ resource "aws_ecrpublic_repository" "public" {
   repository_name = module.label.name
   
   catalog_data {
-    about_text        = "SQS to Firehose bridge Lambda function using lambda-shell-runtime"
-    architectures     = ["ARM 64"]
+    about_text        = "SQS to Firehose bridge Lambda function using lambda-shell-runtime. Source: https://github.com/ql4b/sqs-firehose-bridge"
+    architectures     = ["ARM 64", "x86-64"]
     description       = "Serverless function that bridges SQS messages to Kinesis Data Firehose using Bash and AWS CLI"
     operating_systems = ["Linux"]
-    usage_text        = "docker pull public.ecr.aws/ql4b/sqs-firehose-brige:latest"
+    usage_text        = "docker pull public.ecr.aws/ql4b/sqs-firehose-bridge:latest\n\nDocumentation: https://github.com/ql4b/terraform-aws-firehose-analytics"
   }
 
   provider = aws.virginia
