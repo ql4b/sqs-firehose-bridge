@@ -1,4 +1,6 @@
 
 # cloudless-infra
 .env
-
+lambda.zip
+bootstrap
+.DS_Store
